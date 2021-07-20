@@ -1,0 +1,100 @@
+---
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyhead[L]{Kidney Precision Medicine Project \\ Recruitment Site Report Card \\ `r format(Sys.time(), '%B %d, %Y')`}
+- \fancyfoot[C]{}
+output: pdf_document
+geometry: left=.7cm, right=.7cm, top=2.2cm, bottom=1.2cm
+---
+
+\begin{center}
+\textbf{KPMP Data Quality Report Card}
+\end{center}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+#Load library
+library(Hmisc)
+library(kableExtra)
+library(dplyr)
+library(tidyverse)
+
+load("../report_card_data/prepared_data.RData")
+load("rctfns.RData")
+load("visitsfns.RData")
+load("biospecimensfncs.RData")
+load("setup_basicfns.RData")
+```
+
+```{r}
+jhmi1 = format_rct_kable(data, site = "jhmi", type = "aki",
+                         current_quarter = current_quarter, previous_quarter = previous_quarter,
+                         goal = goal_jhmi, goal1=goal_columbia, goal2=goal_jhmi, goal3=goal_upmc, goal4=goal_yale)
+
+kbl(jhmi1$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
+    col.names=linebreak(c("JHMI", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+  column_spec(1, width="7.4cm") %>%
+  column_spec(4, image=spec_image(c("images/empty.png", jhmi1$change), 30, 30)) %>%
+  column_spec(6, width="3cm", latex_valign="m") %>%
+  # row_spec(0, color="white", background="#2c5494") %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  row_spec(6, background=c("white", jhmi1$bgc$bgc_goal, rep("white",3))) %>%
+  row_spec(14, background=c("white", jhmi1$bgc$bgc_retention, rep("white",3))) %>%
+  pack_rows("Participants not Followed prior to Biopsy (N)", 7, 10, bold=F) %>%
+  pack_rows("Participants not Followed post Biopsy (N)", 11, 13, bold=F) %>%
+  footnote(number="100-(participants not followed post biopsy/total participants biopsied*100).")
+```
+
+```{r}
+jhmi2 = format_crfs_kable(data, site = "jhmi", type = "aki",
+                          current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+kbl(jhmi2$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
+    col.names=linebreak(c("JHMI", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+  column_spec(1, width="7.4cm") %>%
+  column_spec(4, image=spec_image(c("images/empty.png", jhmi2$change), 30, 30)) %>%
+  column_spec(6, width="3cm", latex_valign="m") %>%
+  # row_spec(0, color="white", background="#2c5494") %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  column_spec(2, background=c("#d9d9d9", jhmi2$bgc$current)) %>%
+  column_spec(3, background=c("#d9d9d9", jhmi2$bgc$previous)) %>%
+  pack_rows("Participant Completed Surveys", 4, 5, bold=F) %>%
+  pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 6, 14, bold=F, escape=F) %>%
+  footnote(alphabet=c("Expected: total number past upper limit of allowable window.",
+                      "Includes 24 hour, up to 7 day, 14 day, 28 day, 3 months, 6 months, and 12 months follow-up visits.",
+                      "Includes all consented participants and CRFs from enrollment to 12 months.",
+                      "6 month experience survey was implemented approximately 1 year after the start of recruitment, therefore some participants did not have the opportunity to complete this CRF.",
+                      "Per timepoint, different number of CRFs are included.",
+                      "Due to the COVID-19 pandemic some participants were unable to complete the 3 month visit in-person. Surveys were completed over the phone, however no biospecimens were collected. Excluding biosample CRFs the 3 month AKI CRF completion is 90%."),
+           threeparttable=T)
+```
+
+```{r}
+jhmi3 = format_biospecimens_kable(blood_urine, acd_cbr, shipment, cores_triages, cryostor, 
+                                  site = "jhmi", type = "aki",
+                                  current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+kbl(jhmi3$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
+    col.names=linebreak(c("JHMI", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+  column_spec(1, width="7.9cm", latex_valign="m") %>%
+  column_spec(4, image=spec_image(c("images/empty.png", jhmi3$change), 30, 30)) %>%
+  column_spec(6, width="2.7cm", latex_valign="m") %>%
+  # row_spec(0, color="white", background="#2c5494") %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  column_spec(2, background=c("#d9d9d9", jhmi3$bgc$current, "white")) %>%
+  column_spec(3, background=c("#d9d9d9", jhmi3$bgc$previous, "white")) %>%
+  footnote(symbol="Issues include incorrect temperature and incorrect shipping conditions.")
+```
+
+```{r}
+color_dist = data.frame(color = cell_spec("", 
+                                          background = c("#99e5bc", "#ffff99", "#ff999a")),
+                        dist = c(">=90\\%", "70-<90\\%", "<70\\%"))
+colnames(color_dist) = NULL
+
+kbl(color_dist, linesep="", booktabs=T, align="l", escape=F)
+```
