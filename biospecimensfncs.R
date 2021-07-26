@@ -108,11 +108,11 @@ summarise_biospecimens_each = function(blood_urine, acd_cbr, shipment, cores_tri
                                        current_quarter = c(as.Date("2021-03-02"),as.Date("2021-06-04")),
                                        previous_quarter = c(as.Date("2020-12-01"), as.Date("2021-03-01"))){
   
-  blood_urine_site = blood_urine %>% filter(redcap_data_access_group == site)
-  acd_cbr_site = acd_cbr %>% filter(redcap_data_access_group == site)
-  shipment_site = shipment %>% filter(redcap_data_access_group == site)
-  cores_triages_site = cores_triages %>% filter(redcap_data_access_group == site)
-  cryostor_site = cryostor %>% filter(redcap_data_access_group == site)
+  blood_urine_site = blood_urine %>% filter(redcap_data_access_group %in% site)
+  acd_cbr_site = acd_cbr %>% filter(redcap_data_access_group %in% site)
+  shipment_site = shipment %>% filter(redcap_data_access_group %in% site)
+  cores_triages_site = cores_triages %>% filter(redcap_data_access_group %in% site)
+  cryostor_site = cryostor %>% filter(redcap_data_access_group %in% site)
   
   current_stats = calc_biospecimens(blood_urine_site, acd_cbr_site, shipment_site, cores_triages_site, cryostor_site,
                                     quarter = current_quarter, cum = F)

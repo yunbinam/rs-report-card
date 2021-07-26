@@ -106,7 +106,7 @@ summarise_rct_each = function(data, site = "brigham",
                               previous_quarter = c(as.Date("2020-12-01"), as.Date("2021-03-01")),
                               goal = c(3, 20-3*4)){
   
-  data_site = data %>% filter(redcap_data_access_group == site)
+  data_site = data %>% filter(redcap_data_access_group %in% site)
   
   current_rct = calc_rct(data_site, start = current_quarter[1], end = current_quarter[2], cum = F)
   previous_rct = calc_rct(data_site, start = previous_quarter[1], end = previous_quarter[2], cum = F)

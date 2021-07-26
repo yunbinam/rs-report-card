@@ -330,7 +330,7 @@ summarise_visits_crfs_each = function(data, site = "brigham", type = "ckd",
                                       current_quarter = c(as.Date("2021-03-02"),as.Date("2021-06-04")),
                                       previous_quarter = c(as.Date("2020-12-01"), as.Date("2021-03-01"))){
   
-  data_site = data %>% filter(redcap_data_access_group == site)
+  data_site = data %>% filter(redcap_data_access_group %in% site)
   
   current_stats = calc_visits_crfs(data_site, type = type, quarter = current_quarter, cum = F)
   previous_stats = calc_visits_crfs(data_site, type = type, quarter = previous_quarter, cum = F)
