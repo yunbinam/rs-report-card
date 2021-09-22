@@ -77,17 +77,17 @@ calc_visits_crfs = function(data, type = "ckd",
       expected_crfs_12m = sum(data.biopsied.ckd_12m$fu12m_crfs_expected, na.rm=T)
       completed_crfs_12m = sum(data.biopsied.ckd_12m$fu12m_crfs_completed, na.rm=T)
       
-      # data.biopsied.ckd_18m = data.biopsied.ckd %>% 
-      #   filter(bp_date >= range_18m[1] & bp_date <= range_18m[2])
-      # expected_visits_18m = sum(data.biopsied.ckd_18m$fu18m_visit_expected, na.rm=T)
-      # completed_visits_18m = sum(data.biopsied.ckd_18m$fu18m_visit_completed, na.rm=T)
-      # expected_crfs_18m = sum(data.biopsied.ckd_18m$fu18m_crfs_expected, na.rm=T)
-      # completed_crfs_18m = sum(data.biopsied.ckd_18m$fu18m_crfs_completed, na.rm=T)
+      data.biopsied.ckd_18m = data.biopsied.ckd %>%
+        filter(bp_date >= range_18m[1] & bp_date <= range_18m[2])
+      expected_visits_18m = sum(data.biopsied.ckd_18m$fu18m_visit_expected, na.rm=T)
+      completed_visits_18m = sum(data.biopsied.ckd_18m$fu18m_visit_completed, na.rm=T)
+      expected_crfs_18m = sum(data.biopsied.ckd_18m$fu18m_crfs_expected, na.rm=T)
+      completed_crfs_18m = sum(data.biopsied.ckd_18m$fu18m_crfs_completed, na.rm=T)
       
-      expected_visits = sum(expected_visits_24h, expected_visits_14d, expected_visits_28d, expected_visits_6m, expected_visits_12m)#, expected_visits_18m)
-      completed_visits = sum(completed_visits_24h, completed_visits_14d, completed_visits_28d, completed_visits_6m, completed_visits_12m)#, completed_visits_18m)
-      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_14d, expected_crfs_28d, expected_crfs_6m, expected_crfs_12m)#, expected_crfs_18m)
-      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_14d, completed_crfs_28d, completed_crfs_6m, completed_crfs_12m)#, completed_crfs_18m)
+      expected_visits = sum(expected_visits_24h, expected_visits_14d, expected_visits_28d, expected_visits_6m, expected_visits_12m, expected_visits_18m)
+      completed_visits = sum(completed_visits_24h, completed_visits_14d, completed_visits_28d, completed_visits_6m, completed_visits_12m, completed_visits_18m)
+      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_14d, expected_crfs_28d, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m)
+      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_14d, completed_crfs_28d, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m)
       
       expected_pes_28d = expected_visits_28d
       completed_pes_28d = sum(data.biopsied.ckd_28d$participant_experience_survey_28d_complete==2, na.rm=T)
@@ -161,17 +161,17 @@ calc_visits_crfs = function(data, type = "ckd",
       expected_crfs_12m = sum(data.biopsied.aki_12m$fu12m_crfs_expected, na.rm=T)
       completed_crfs_12m = sum(data.biopsied.aki_12m$fu12m_crfs_completed, na.rm=T)
       
-      # data.biopsied.aki_18m = data.biopsied.aki %>% 
-      #   filter(bp_date >= range_18m[1] & bp_date <= range_18m[2])
-      # expected_visits_18m = sum(data.biopsied.aki_18m$fu18m_visit_expected, na.rm=T)
-      # completed_visits_18m = sum(data.biopsied.aki_18m$fu18m_visit_completed, na.rm=T)
-      # expected_crfs_18m = sum(data.biopsied.aki_18m$fu18m_crfs_expected, na.rm=T)
-      # completed_crfs_18m = sum(data.biopsied.aki_18m$fu18m_crfs_completed, na.rm=T)
-      
-      expected_visits = sum(expected_visits_24h, expected_visits_7daki, expected_visits_14d, expected_visits_28d, expected_visits_3maki, expected_visits_6m, expected_visits_12m)#, expected_visits_18m)
-      completed_visits = sum(completed_visits_24h, completed_visits_7daki, completed_visits_14d, completed_visits_28d, completed_visits_3maki, completed_visits_6m, completed_visits_12m)#, completed_visits_18m)
-      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_7daki, expected_crfs_14d, expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m)#, expected_crfs_18m)
-      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_7daki, completed_crfs_14d, completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m)#, completed_crfs_18m)
+      data.biopsied.aki_18m = data.biopsied.aki %>%
+        filter(bp_date >= range_18m[1] & bp_date <= range_18m[2])
+      expected_visits_18m = sum(data.biopsied.aki_18m$fu18m_visit_expected, na.rm=T)
+      completed_visits_18m = sum(data.biopsied.aki_18m$fu18m_visit_completed, na.rm=T)
+      expected_crfs_18m = sum(data.biopsied.aki_18m$fu18m_crfs_expected, na.rm=T)
+      completed_crfs_18m = sum(data.biopsied.aki_18m$fu18m_crfs_completed, na.rm=T)
+
+      expected_visits = sum(expected_visits_24h, expected_visits_7daki, expected_visits_14d, expected_visits_28d, expected_visits_3maki, expected_visits_6m, expected_visits_12m, expected_visits_18m)
+      completed_visits = sum(completed_visits_24h, completed_visits_7daki, completed_visits_14d, completed_visits_28d, completed_visits_3maki, completed_visits_6m, completed_visits_12m, completed_visits_18m)
+      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_7daki, expected_crfs_14d, expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m)
+      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_7daki, completed_crfs_14d, completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m)
       
       expected_pes_28d = expected_visits_28d
       completed_pes_28d = sum(data.biopsied.aki_28d$participant_experience_survey_28d_complete==2, na.rm=T)
@@ -220,15 +220,15 @@ calc_visits_crfs = function(data, type = "ckd",
       expected_crfs_12m = sum(data.biopsied.ckd$fu12m_crfs_expected, na.rm=T)
       completed_crfs_12m = sum(data.biopsied.ckd$fu12m_crfs_completed, na.rm=T)
       
-      # expected_visits_18m = sum(data.biopsied.ckd$fu18m_visit_expected, na.rm=T)
-      # completed_visits_18m = sum(data.biopsied.ckd$fu18m_visit_completed, na.rm=T)
-      # expected_crfs_18m = sum(data.biopsied.ckd$fu18m_crfs_expected, na.rm=T)
-      # completed_crfs_18m = sum(data.biopsied.ckd$fu18m_crfs_completed, na.rm=T)
-      
-      expected_visits = sum(expected_visits_24h, expected_visits_14d, expected_visits_28d, expected_visits_6m, expected_visits_12m)#, expected_visits_18m)
-      completed_visits = sum(completed_visits_24h, completed_visits_14d, completed_visits_28d, completed_visits_6m, completed_visits_12m)#, completed_visits_18m)
-      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_14d, expected_crfs_28d, expected_crfs_6m, expected_crfs_12m)#, expected_crfs_18m)
-      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_14d, completed_crfs_28d, completed_crfs_6m, completed_crfs_12m)#, completed_crfs_18m)
+      expected_visits_18m = sum(data.biopsied.ckd$fu18m_visit_expected, na.rm=T)
+      completed_visits_18m = sum(data.biopsied.ckd$fu18m_visit_completed, na.rm=T)
+      expected_crfs_18m = sum(data.biopsied.ckd$fu18m_crfs_expected, na.rm=T)
+      completed_crfs_18m = sum(data.biopsied.ckd$fu18m_crfs_completed, na.rm=T)
+
+      expected_visits = sum(expected_visits_24h, expected_visits_14d, expected_visits_28d, expected_visits_6m, expected_visits_12m, expected_visits_18m)
+      completed_visits = sum(completed_visits_24h, completed_visits_14d, completed_visits_28d, completed_visits_6m, completed_visits_12m, completed_visits_18m)
+      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_14d, expected_crfs_28d, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m)
+      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_14d, completed_crfs_28d, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m)
       
       expected_pes_28d = expected_visits_28d
       completed_pes_28d = sum(data.biopsied.ckd$participant_experience_survey_28d_complete==2, na.rm=T)
@@ -241,8 +241,8 @@ calc_visits_crfs = function(data, type = "ckd",
       
     } else{
       
-      expected_crfs_enrollment = sum(data.enrolled.aki$enrollment_crfs_expected, na.rm=T)
-      completed_crfs_enrollment = sum(data.enrolled.aki$enrollment_crfs_completed, na.rm=T)
+      expected_crfs_enrollment = sum(data.enrolled.aki$enrollmentaki_crfs_expected, na.rm=T)
+      completed_crfs_enrollment = sum(data.enrolled.aki$enrollmentaki_crfs_completed, na.rm=T)
       
       expected_crfs_biopsy = sum(data.biopsied.aki$biopsy_crfs_expected, na.rm=T)
       completed_crfs_biopsy = sum(data.biopsied.aki$biopsy_crfs_completed, na.rm=T)
@@ -282,15 +282,15 @@ calc_visits_crfs = function(data, type = "ckd",
       expected_crfs_12m = sum(data.biopsied.aki$fu12m_crfs_expected, na.rm=T)
       completed_crfs_12m = sum(data.biopsied.aki$fu12m_crfs_completed, na.rm=T)
       
-      # expected_visits_18m = sum(data.biopsied.aki$fu18m_visit_expected, na.rm=T)
-      # completed_visits_18m = sum(data.biopsied.aki$fu18m_visit_completed, na.rm=T)
-      # expected_crfs_18m = sum(data.biopsied.aki$fu18m_crfs_expected, na.rm=T)
-      # completed_crfs_18m = sum(data.biopsied.aki$fu18m_crfs_completed, na.rm=T)
-      
-      expected_visits = sum(expected_visits_24h, expected_visits_7daki, expected_visits_14d, expected_visits_28d, expected_visits_3maki, expected_visits_6m, expected_visits_12m)#, expected_visits_18m)
-      completed_visits = sum(completed_visits_24h, completed_visits_7daki, completed_visits_14d, completed_visits_28d, completed_visits_3maki, completed_visits_6m, completed_visits_12m)#, completed_visits_18m)
-      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_7daki, expected_crfs_14d, expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m)#, expected_crfs_18m)
-      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_7daki, completed_crfs_14d, completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m)#, completed_crfs_18m)
+      expected_visits_18m = sum(data.biopsied.aki$fu18m_visit_expected, na.rm=T)
+      completed_visits_18m = sum(data.biopsied.aki$fu18m_visit_completed, na.rm=T)
+      expected_crfs_18m = sum(data.biopsied.aki$fu18m_crfs_expected, na.rm=T)
+      completed_crfs_18m = sum(data.biopsied.aki$fu18m_crfs_completed, na.rm=T)
+
+      expected_visits = sum(expected_visits_24h, expected_visits_7daki, expected_visits_14d, expected_visits_28d, expected_visits_3maki, expected_visits_6m, expected_visits_12m, expected_visits_18m)
+      completed_visits = sum(completed_visits_24h, completed_visits_7daki, completed_visits_14d, completed_visits_28d, completed_visits_3maki, completed_visits_6m, completed_visits_12m, completed_visits_18m)
+      expected_crfs = sum(expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_7daki, expected_crfs_14d, expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m)
+      completed_crfs = sum(completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_7daki, completed_crfs_14d, completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m)
       
       expected_pes_28d = expected_visits_28d
       completed_pes_28d = sum(data.biopsied.aki$participant_experience_survey_28d_complete==2, na.rm=T)
@@ -307,20 +307,20 @@ calc_visits_crfs = function(data, type = "ckd",
   if(type == "ckd"){
     return(list(expected_stats = c(expected_visits, expected_crfs, expected_pes_28d, expected_pes_6m, 
                                    expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_14d,
-                                   expected_crfs_28d, expected_crfs_6m, expected_crfs_12m, #expected_crfs_18m,
+                                   expected_crfs_28d, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m,
                                    expected_return_of_bp_1m),
                 completed_stats = c(completed_visits, completed_crfs, completed_pes_28d, completed_pes_6m, 
                                     completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_14d,
-                                    completed_crfs_28d, completed_crfs_6m, completed_crfs_12m, #completed_crfs_18m,
+                                    completed_crfs_28d, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m,
                                     completed_return_of_bp_1m)))
   } else{
     return(list(expected_stats = c(expected_visits, expected_crfs, expected_pes_28d, expected_pes_6m, 
                                    expected_crfs_enrollment, expected_crfs_biopsy, expected_crfs_24h, expected_crfs_7daki, expected_crfs_14d,
-                                   expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m, #expected_crfs_18m,
+                                   expected_crfs_28d, expected_crfs_3maki, expected_crfs_6m, expected_crfs_12m, expected_crfs_18m,
                                    expected_return_of_bp_1m),
                 completed_stats = c(completed_visits, completed_crfs, completed_pes_28d, completed_pes_6m, 
                                     completed_crfs_enrollment, completed_crfs_biopsy, completed_crfs_24h, completed_crfs_7daki, completed_crfs_14d,
-                                    completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m, #completed_crfs_18m,
+                                    completed_crfs_28d, completed_crfs_3maki, completed_crfs_6m, completed_crfs_12m, completed_crfs_18m,
                                     completed_return_of_bp_1m)))
   }
 }
@@ -367,7 +367,7 @@ summarise_visits_crfs_each = function(data, site = "brigham", type = "ckd",
                paste0("Visits", footnote_marker_alphabet(2, "latex")), paste0("CRFs", footnote_marker_alphabet(3, "latex")),
                "28d Participant Experience Survey", paste0("6m Participant Experience Survey", footnote_marker_alphabet(4, "latex")),
                "Enrollment (13)","Biopsy Visit (8)","24h Follow-up (1)","14d Follow-up (1)","28d Follow-up (2)",
-               "6m Phone Visit (4)","12m Visit (8)",#"18m Phone Visit (2)",
+               "6m Phone Visit (4)","12m Visit (8)", "18m Phone Visit (2)",
                "Return of Biopsy Results within 1 Month"),
       current = c("", current_chrc),
       previous = c("", previous_chrc),
@@ -382,7 +382,7 @@ summarise_visits_crfs_each = function(data, site = "brigham", type = "ckd",
                paste0("Visits", footnote_marker_alphabet(2, "latex")), paste0("CRFs", footnote_marker_alphabet(3, "latex")),
                "28d Participant Experience Survey", paste0("6m Participant Experience Survey", footnote_marker_alphabet(4, "latex")),
                "Enrollment (11)","Biopsy Visit (8)","24h Follow-up (1)","AKI-only (up to 7 days) (5)","14d Follow-up (1)","28d Follow-up (2)",
-               paste0("3m AKI Visit", footnote_marker_alphabet(6, "latex"), " (7)"),"6m Phone Visit (4)","12m Visit (8)",#"18m Phone Visit (2)",
+               paste0("3m AKI Visit", footnote_marker_alphabet(6, "latex"), " (7)"),"6m Phone Visit (4)","12m Visit (8)", "18m Phone Visit (2)",
                "Return of Biopsy Results within 1 Month"),
       current = c("", current_chrc),
       previous = c("", previous_chrc),

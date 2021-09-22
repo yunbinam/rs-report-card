@@ -8,18 +8,18 @@ rm(list=ls())
 ckd_sites = c("brigham", "ccf", "joslin", "utsw")
 aki_sites = c("columbia", "jhmi", "upmc", "yale")
 
-current_quarter = c(as.Date("2021-03-02"), as.Date("2021-06-04"))
-previous_quarter = c(as.Date("2020-12-01"), as.Date("2021-03-01"))
+current_quarter = c(as.Date("2021-06-05"), as.Date("2021-09-01"))
+previous_quarter = c(as.Date("2021-03-02"), as.Date("2021-06-04"))
 
-goal_brigham = c(3, 20-3*4)
-goal_ccf = c(5, 40-5*4) 
-goal_joslin = c(3, 20-3*4) 
-goal_utsw = c(5, 40-5*4)
+goal_brigham = c(3, 20-3*3)
+goal_ccf = c(5, 40-5*3) 
+goal_joslin = c(3, 20-3*3) 
+goal_utsw = c(5, 40-5*3)
 
-goal_columbia = c(3, 25-3*4)
-goal_jhmi = c(2, 15-2*4)
-goal_upmc = c(3, 25-3*4)
-goal_yale = c(2, 15-2*4)
+goal_columbia = c(3, 25-3*3)
+goal_jhmi = c(2, 15-2*3)
+goal_upmc = c(3, 25-3*3)
+goal_yale = c(2, 15-2*3)
 
 calc_change = function(current_stats, previous_stats, higher_better = T){
   

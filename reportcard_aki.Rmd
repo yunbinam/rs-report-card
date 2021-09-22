@@ -1,0 +1,236 @@
+---
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyhead[L]{Kidney Precision Medicine Project \\ Recruitment Site Report Card \\ `r format(Sys.time(), '%B %d, %Y')`}
+- \fancyfoot[C]{}
+output: pdf_document
+geometry: left=.7cm, right=.7cm, top=2.7cm, bottom=2cm
+---
+
+\begin{center}
+\textbf{KPMP Combined Data Quality Report Card}
+\end{center}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+#Load library
+library(Hmisc)
+library(kableExtra)
+library(dplyr)
+library(tidyverse)
+
+load("../report_card_data/0901/prepared_data0901.RData")
+load("rctfns.RData")
+load("visitsfns.RData")
+load("biospecimensfncs.RData")
+load("setup_basicfns.RData")
+```
+
+```{r recruitment and retention}
+sum_columbia = summarise_rct_each(data = data, site = "columbia", 
+                                 current_quarter = current_quarter, 
+                                 previous_quarter = previous_quarter,
+                                 goal = goal_columbia)
+sum_jhmi = summarise_rct_each(data = data, site = "jhmi", 
+                             current_quarter = current_quarter, 
+                             previous_quarter = previous_quarter,
+                             goal = goal_jhmi)
+sum_upmc = summarise_rct_each(data = data, site = "upmc", 
+                                current_quarter = current_quarter, 
+                                previous_quarter = previous_quarter,
+                                goal = goal_upmc)
+sum_yale = summarise_rct_each(data = data, site = "yale", 
+                              current_quarter = current_quarter, 
+                              previous_quarter = previous_quarter,
+                              goal = goal_yale)
+
+# apply(sum_columbia$kb[7:10,-1], 2, function(x) sum(as.integer(x)))
+
+sum_aki = rbind(sum_columbia$kb[1,], 
+                sum_columbia$kb[2,], sum_jhmi$kb[2,], sum_upmc$kb[2,], sum_yale$kb[2,],
+                sum_columbia$kb[3,], sum_jhmi$kb[3,], sum_upmc$kb[3,], sum_yale$kb[3,],
+                sum_columbia$kb[4,], sum_jhmi$kb[4,], sum_upmc$kb[4,], sum_yale$kb[4,],
+                sum_columbia$kb[5,], sum_jhmi$kb[5,], sum_upmc$kb[5,], sum_yale$kb[5,],
+                sum_columbia$kb[6,], sum_jhmi$kb[6,], sum_upmc$kb[6,], sum_yale$kb[6,],
+                sum_columbia$kb[7,], sum_jhmi$kb[7,], sum_upmc$kb[7,], sum_yale$kb[7,],
+                sum_columbia$kb[8,], sum_jhmi$kb[8,], sum_upmc$kb[8,], sum_yale$kb[8,],
+                sum_columbia$kb[9,], sum_jhmi$kb[9,], sum_upmc$kb[9,], sum_yale$kb[9,],
+                sum_columbia$kb[10,], sum_jhmi$kb[10,], sum_upmc$kb[10,], sum_yale$kb[10,],
+                sum_columbia$kb[11,], sum_jhmi$kb[11,], sum_upmc$kb[11,], sum_yale$kb[11,],
+                sum_columbia$kb[12,], sum_jhmi$kb[12,], sum_upmc$kb[12,], sum_yale$kb[12,],
+                sum_columbia$kb[13,], sum_jhmi$kb[13,], sum_upmc$kb[13,], sum_yale$kb[13,],
+                sum_columbia$kb[14,], sum_jhmi$kb[14,], sum_upmc$kb[14,], sum_yale$kb[14,]) %>%
+  add_column(sites = c("", rep(c("Columbia", "JHMI", "UPMC", "Yale"), 13)), .before = "current")
+
+sum_all_sites = summarise_all_sites_by_type(data = data, type = "aki", 
+                                            goal1 = goal_columbia, goal2 = goal_jhmi, goal3 = goal_upmc, goal4 = goal_yale)
+
+sum_aki = sum_aki %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_aki) = 1:nrow(sum_aki)
+
+change = rep(sum_columbia$change, each = 4)
+change[seq(from = 2, to = 52, by = 4)] = sum_jhmi$change
+change[seq(from = 3, to = 52, by = 4)] = sum_upmc$change
+change[seq(from = 4, to = 52, by = 4)] = sum_yale$change
+
+col_goal_crr = c(sum_columbia$bgc$bgc_goal[1], sum_jhmi$bgc$bgc_goal[1], sum_upmc$bgc$bgc_goal[1], sum_yale$bgc$bgc_goal[1])
+col_rt_crr = c(sum_columbia$bgc$bgc_retention[1], sum_jhmi$bgc$bgc_retention[1], sum_upmc$bgc$bgc_retention[1], sum_yale$bgc$bgc_retention[1])
+col_goal_prv = c(sum_columbia$bgc$bgc_goal[2], sum_jhmi$bgc$bgc_goal[2], sum_upmc$bgc$bgc_goal[2], sum_yale$bgc$bgc_goal[2])
+col_rt_prv = c(sum_columbia$bgc$bgc_retention[2], sum_jhmi$bgc$bgc_retention[2], sum_upmc$bgc$bgc_retention[2], sum_yale$bgc$bgc_retention[2])
+
+kbl(sum_aki, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change), 30, 30)) %>%
+  column_spec(3, background=c(rep("white", 17), col_goal_crr, rep("white",28), col_rt_crr)) %>%
+  column_spec(4, background=c(rep("white", 17), col_goal_prv, rep("white",28), col_rt_prv)) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  pack_rows("Not Followed prior to Biopsy (N)", 22, 37, bold=F) %>%
+  pack_rows("Not Followed post Biopsy (N)", 38, 49, bold=F) %>%
+  footnote(number="100-(participants not followed post biopsy/total participants biopsied*100).")
+```
+
+\newpage
+
+```{r visits and crfs}
+sum_columbia = summarise_visits_crfs_each(data = data, site = "columbia", type = "aki",
+                                         current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_jhmi = summarise_visits_crfs_each(data = data, site = "jhmi", type = "aki",
+                                     current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_upmc = summarise_visits_crfs_each(data = data, site = "upmc", type = "aki",
+                                        current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_yale = summarise_visits_crfs_each(data = data, site = "yale", type = "aki",
+                                      current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+sum_aki = rbind(sum_columbia$kb[1,], 
+                sum_columbia$kb[2,], sum_jhmi$kb[2,], sum_upmc$kb[2,], sum_yale$kb[2,],
+                sum_columbia$kb[3,], sum_jhmi$kb[3,], sum_upmc$kb[3,], sum_yale$kb[3,],
+                sum_columbia$kb[4,], sum_jhmi$kb[4,], sum_upmc$kb[4,], sum_yale$kb[4,],
+                sum_columbia$kb[5,], sum_jhmi$kb[5,], sum_upmc$kb[5,], sum_yale$kb[5,],
+                sum_columbia$kb[6,], sum_jhmi$kb[6,], sum_upmc$kb[6,], sum_yale$kb[6,],
+                sum_columbia$kb[7,], sum_jhmi$kb[7,], sum_upmc$kb[7,], sum_yale$kb[7,],
+                sum_columbia$kb[8,], sum_jhmi$kb[8,], sum_upmc$kb[8,], sum_yale$kb[8,],
+                sum_columbia$kb[9,], sum_jhmi$kb[9,], sum_upmc$kb[9,], sum_yale$kb[9,],
+                sum_columbia$kb[10,], sum_jhmi$kb[10,], sum_upmc$kb[10,], sum_yale$kb[10,],
+                sum_columbia$kb[11,], sum_jhmi$kb[11,], sum_upmc$kb[11,], sum_yale$kb[11,],
+                sum_columbia$kb[12,], sum_jhmi$kb[12,], sum_upmc$kb[12,], sum_yale$kb[12,],
+                sum_columbia$kb[13,], sum_jhmi$kb[13,], sum_upmc$kb[13,], sum_yale$kb[13,],
+                sum_columbia$kb[14,], sum_jhmi$kb[14,], sum_upmc$kb[14,], sum_yale$kb[14,],
+                sum_columbia$kb[15,], sum_jhmi$kb[15,], sum_upmc$kb[15,], sum_yale$kb[15,],
+                sum_columbia$kb[16,], sum_jhmi$kb[16,], sum_upmc$kb[16,], sum_yale$kb[16,]) %>%
+  add_column(sites = c("", rep(c("Columbia", "JHMI", "UPMC", "Yale"), 15)), .before = "current")
+
+sum_all_sites = summarise_crfs_all_sites_by_type(data = data, type = "aki")
+
+sum_aki = sum_aki %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_aki) = 1:nrow(sum_aki)
+
+change = rep(sum_columbia$change, each = 4)
+change[seq(from = 2, to = 163, by = 4)] = sum_jhmi$change
+change[seq(from = 3, to = 163, by = 4)] = sum_upmc$change
+change[seq(from = 4, to = 163, by = 4)] = sum_yale$change
+
+col_crr = rep(sum_columbia$bgc$current, each = 4)
+col_crr[seq(from = 2, to = 163, by = 4)] = sum_jhmi$bgc$current
+col_crr[seq(from = 3, to = 163, by = 4)] = sum_upmc$bgc$current
+col_crr[seq(from = 4, to = 163, by = 4)] = sum_yale$bgc$current
+
+col_prv = rep(sum_columbia$bgc$previous, each = 4)
+col_prv[seq(from = 2, to = 163, by = 4)] = sum_jhmi$bgc$previous
+col_prv[seq(from = 3, to = 163, by = 4)] = sum_upmc$bgc$previous
+col_prv[seq(from = 4, to = 163, by = 4)] = sum_yale$bgc$previous
+
+kbl(sum_aki, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  column_spec(1, width="4.7cm") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change), 30, 30)) %>%
+  column_spec(3, background=c("white", col_crr)) %>%
+  column_spec(4, background=c("white", col_prv)) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  # pack_rows("Participant Completed Surveys", 10, 17, bold=F, latex_gap_space = "0em") %>%
+  # pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 18, 49, bold=F, escape=F, latex_gap_space = "0em") %>%
+  footnote(alphabet=c("Expected: total number past upper limit of allowable window.",
+                      "Includes 24 hour, up to 7 day, 14 day, 28 day, 3 months, 6 months, and 12 months follow-up visits.",
+                      "Includes all consented participants and CRFs from enrollment to 12 months.",
+                      "6 month experience survey was implemented approximately 1 year after the start of recruitment, therefore some participants did not have the opportunity to complete this CRF.",
+                      "Per timepoint, different number of CRFs are included.",
+                      "Due to the COVID-19 pandemic some participants were unable to complete the 3 month visit in-person. Surveys were completed over the phone, however no biospecimens were collected. Excluding biosample CRFs the 3 month AKI CRF completion is 90%."),
+           threeparttable=T)
+```
+
+\newpage
+
+
+```{r biospecimens}
+sum_columbia = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "columbia",
+                                          current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_jhmi = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "jhmi",
+                                      current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_upmc = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "upmc",
+                                         current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_yale = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "yale",
+                                       current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+sum_aki = rbind(sum_columbia$kb[1,], 
+                sum_columbia$kb[2,], sum_jhmi$kb[2,], sum_upmc$kb[2,], sum_yale$kb[2,],
+                sum_columbia$kb[3,], sum_jhmi$kb[3,], sum_upmc$kb[3,], sum_yale$kb[3,],
+                sum_columbia$kb[4,], sum_jhmi$kb[4,], sum_upmc$kb[4,], sum_yale$kb[4,],
+                sum_columbia$kb[5,], sum_jhmi$kb[5,], sum_upmc$kb[5,], sum_yale$kb[5,],
+                sum_columbia$kb[6,], sum_jhmi$kb[6,], sum_upmc$kb[6,], sum_yale$kb[6,],
+                sum_columbia$kb[7,], sum_jhmi$kb[7,], sum_upmc$kb[7,], sum_yale$kb[7,],
+                sum_columbia$kb[8,], sum_jhmi$kb[8,], sum_upmc$kb[8,], sum_yale$kb[8,],
+                sum_columbia$kb[9,], sum_jhmi$kb[9,], sum_upmc$kb[9,], sum_yale$kb[9,]) %>%
+  add_column(sites = c("", rep(c("Columbia", "JHMI", "UPMC", "Yale"), 8)), .before = "current")
+
+sum_all_sites = summarise_biospecimens_all_sites_by_type(blood_urine, acd_cbr, shipment, cores_triages, cryostor, type = "aki")
+
+sum_aki = sum_aki %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_aki) = 1:nrow(sum_aki)
+
+change = rep(sum_columbia$change, each = 4)
+change[seq(from = 2, to = 29, by = 4)] = sum_jhmi$change
+change[seq(from = 3, to = 29, by = 4)] = sum_upmc$change
+change[seq(from = 4, to = 29, by = 4)] = sum_yale$change
+
+col_crr = rep(sum_columbia$bgc$current, each = 4)
+col_crr[seq(from = 2, to = 29, by = 4)] = sum_jhmi$bgc$current
+col_crr[seq(from = 3, to = 29, by = 4)] = sum_upmc$bgc$current
+col_crr[seq(from = 4, to = 29, by = 4)] = sum_yale$bgc$current
+
+col_prv = rep(sum_columbia$bgc$previous, each = 4)
+col_prv[seq(from = 2, to = 29, by = 4)] = sum_jhmi$bgc$previous
+col_prv[seq(from = 3, to = 29, by = 4)] = sum_upmc$bgc$previous
+col_prv[seq(from = 4, to = 29, by = 4)] = sum_yale$bgc$previous
+
+kbl(sum_aki, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+  column_spec(1, width="5.7cm") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change, rep("images/empty.png", 4)), 30, 30)) %>%
+  column_spec(3, background=c("white", col_crr, rep("white", 4))) %>%
+  column_spec(4, background=c("white", col_prv, rep("white", 4))) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  # pack_rows("Participant Completed Surveys", 10, 17, bold=F, latex_gap_space = "0em") %>%
+  # pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 18, 49, bold=F, escape=F, latex_gap_space = "0em") %>%
+  footnote(symbol="Issues include incorrect temperature and incorrect shipping conditions.")
+```
+
+```{r}
+color_dist = data.frame(color = cell_spec("", 
+                                          background = c("#99e5bc", "#ffff99", "#ff999a")),
+                        dist = c(">=90\\%", "70-<90\\%", "<70\\%"))
+colnames(color_dist) = NULL
+
+kbl(color_dist, linesep="", booktabs=T, align="l", escape=F)
+```

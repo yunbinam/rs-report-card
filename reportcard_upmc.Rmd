@@ -5,7 +5,7 @@ header-includes:
 - \fancyhead[L]{Kidney Precision Medicine Project \\ Recruitment Site Report Card \\ `r format(Sys.time(), '%B %d, %Y')`}
 - \fancyfoot[C]{}
 output: pdf_document
-geometry: left=.7cm, right=.7cm, top=2.2cm, bottom=1.2cm
+geometry: left=.7cm, right=.7cm, top=1.7cm, bottom=1cm
 ---
 
 \begin{center}
@@ -20,7 +20,7 @@ library(kableExtra)
 library(dplyr)
 library(tidyverse)
 
-load("../report_card_data/prepared_data.RData")
+load("../report_card_data/0901/prepared_data0901.RData")
 load("rctfns.RData")
 load("visitsfns.RData")
 load("biospecimensfncs.RData")
@@ -33,7 +33,7 @@ upmc1 = format_rct_kable(data, site = "upmc", type = "aki",
                          goal = goal_upmc, goal1=goal_columbia, goal2=goal_jhmi, goal3=goal_upmc, goal4=goal_yale)
 
 kbl(upmc1$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UPMC", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UPMC", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.4cm") %>%
   column_spec(4, image=spec_image(c("images/empty.png", upmc1$change), 30, 30)) %>%
@@ -52,7 +52,7 @@ upmc2 = format_crfs_kable(data, site = "upmc", type = "aki",
                           current_quarter = current_quarter, previous_quarter = previous_quarter)
 
 kbl(upmc2$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UPMC", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UPMC", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.4cm") %>%
   column_spec(4, image=spec_image(c("images/empty.png", upmc2$change), 30, 30)) %>%
@@ -62,7 +62,7 @@ kbl(upmc2$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
   column_spec(2, background=c("#d9d9d9", upmc2$bgc$current)) %>%
   column_spec(3, background=c("#d9d9d9", upmc2$bgc$previous)) %>%
   pack_rows("Participant Completed Surveys", 4, 5, bold=F) %>%
-  pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 6, 14, bold=F, escape=F) %>%
+  pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 6, 15, bold=F, escape=F) %>%
   footnote(alphabet=c("Expected: total number past upper limit of allowable window.",
                       "Includes 24 hour, up to 7 day, 14 day, 28 day, 3 months, 6 months, and 12 months follow-up visits.",
                       "Includes all consented participants and CRFs from enrollment to 12 months.",
@@ -78,7 +78,7 @@ upmc3 = format_biospecimens_kable(blood_urine, acd_cbr, shipment, cores_triages,
                                   current_quarter = current_quarter, previous_quarter = previous_quarter)
 
 kbl(upmc3$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UPMC", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UPMC", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All AKI Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.9cm", latex_valign="m") %>%
   column_spec(4, image=spec_image(c("images/empty.png", upmc3$change), 30, 30)) %>%

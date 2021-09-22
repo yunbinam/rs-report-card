@@ -8,7 +8,7 @@ rm(list=ls())
 load("setup_basicfns.RData")
 
 #Read Data
-dat = read.csv('../report_card_data/KPMPParticipantManag-RSReport_DATA_2021-07-20_0958.csv')
+dat = read.csv('../report_card_data/0901/KPMPParticipantManag-RSReport_DATA_2021-09-01_1620.csv')
 
 #Store Data of Participants who entered eligibility assessment
 rct = dat[dat$redcap_event_name == "screening_arm_1",
@@ -77,16 +77,16 @@ data=data %>%
 ########################################################
 ###################### enrollment ######################
 ########################################################
-enrollment = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="", 
+enrollment = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument==""  & dat$study_id %in% data[data$enrolled==1,]$study_id, 
                  c("study_id","contact_information_complete","demographic_information_complete","participant_medical_history_complete","personal_history_complete","coordinator_medical_history_complete","physical_measurements_complete","participant_reported_outcome_measures_complete","health_literacy_questionnaire_complete","laboratory_results_complete")]
 
-enrollment_blood = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_blood",
+enrollment_blood = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_blood" & dat$study_id %in% data[data$enrolled==1,]$study_id,
                        c("study_id","redcap_repeat_instance","biosample_blood_complete")]
-enrollment_spot_urine = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_spot_urine",
+enrollment_spot_urine = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_spot_urine" & dat$study_id %in% data[data$enrolled==1,]$study_id,
                             c("study_id","redcap_repeat_instance","biosample_spot_urine_complete")]
-enrollment_timed_urine = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_timed_urine",
+enrollment_timed_urine = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_timed_urine" & dat$study_id %in% data[data$enrolled==1,]$study_id,
                              c("study_id","redcap_repeat_instance","biosample_timed_urine_complete")]
-enrollment_stool = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_stool",
+enrollment_stool = dat[dat$redcap_event_name=="enrollment_arm_1" & dat$redcap_repeat_instrument=="biosample_stool" & dat$study_id %in% data[data$enrolled==1,]$study_id,
                        c("study_id","redcap_repeat_instance","biosample_stool_complete")]
 
 enrollment_blood = enrollment_blood %>%
@@ -288,11 +288,11 @@ fu3maki = fu3maki %>%
 data = merge(data, fu3maki, by = "study_id", all.x = TRUE)
 
 data = data %>%
-  mutate(fu3maki_crfs_expected = ifelse(biopsied==1 & (redcap_data_access_group %in% aki_sites) & ((notfollowed_pb == 0 & as.Date(bp_date) + months(4) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(4) < notfollowed_pb_date)), 1*7, 0))
+  mutate(fu3maki_crfs_expected = ifelse(biopsied==1 & (redcap_data_access_group %in% aki_sites) & ((notfollowed_pb == 0 & as.Date(bp_date) < as.Date(current_quarter[2]) - months(4)) | (notfollowed_pb == 1 & as.Date(bp_date) < as.Date(notfollowed_pb_date) - months(4))), 1*7, 0))
 
 data = data %>%
   mutate(fu3maki_visit_completed = ifelse(participant_followup_complete_3maki == 2 & fu_yn_3maki == 1, 1, 0),
-         fu3maki_visit_expected = ifelse(biopsied==1 & (redcap_data_access_group %in% aki_sites) & ((notfollowed_pb == 0 & as.Date(bp_date) + months(4) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(4) < notfollowed_pb_date)), 1, 0))
+         fu3maki_visit_expected = ifelse(biopsied==1 & (redcap_data_access_group %in% aki_sites) & ((notfollowed_pb == 0 & as.Date(bp_date) < as.Date(current_quarter[2]) - months(4)) | (notfollowed_pb == 1 & as.Date(bp_date) < as.Date(notfollowed_pb_date) - months(4))), 1, 0))
 
 data$fu3maki_crfs_completed = ifelse(data$fu3maki_crfs_expected==0, 0, data$fu3maki_crfs_completed)
 data$fu3maki_visit_completed = ifelse(data$fu3maki_visit_expected==0, 0, data$fu3maki_visit_completed)
@@ -313,14 +313,10 @@ fu6m = fu6m %>%
 data = merge(data, fu6m, by = "study_id", all.x = TRUE)
 data = data %>%
   mutate(fu6m_crfs_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) + months(9) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(9) < notfollowed_pb_date)), 1*4, 0))
-############ temporary fix for "2021-02-29" ############
-data$fu6m_crfs_expected = ifelse(is.na(data$fu6m_crfs_expected), 1*4, data$fu6m_crfs_expected)
 
 data = data %>%
   mutate(fu6m_visit_completed = ifelse(participant_followup_complete_6m == 2 & fu_yn_6m == 1, 1, 0),
          fu6m_visit_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) + months(9) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(9) < notfollowed_pb_date)), 1, 0))
-############ temporary fix for "2021-02-29" ############
-data$fu6m_visit_expected = ifelse(is.na(data$fu6m_visit_expected), 1, data$fu6m_visit_expected)
 
 data$fu6m_crfs_completed = ifelse(data$fu6m_crfs_expected==0, 0, data$fu6m_crfs_completed)
 data$fu6m_visit_completed = ifelse(data$fu6m_visit_expected==0, 0, data$fu6m_visit_completed)
@@ -351,22 +347,25 @@ data$fu12m_visit_completed = ifelse(data$fu12m_visit_expected==0, 0, data$fu12m_
 ########################################################
 ######################## fu 18m ########################
 ########################################################
-# fu18m = dat[dat$redcap_event_name=="18_months_arm_1" & dat$redcap_repeat_instrument == "",
-#             c("study_id","fu_date","fu_yn","participant_followup_complete","laboratory_results_complete")]
-# colnames(fu18m) = c(colnames(fu18m)[1],paste0(colnames(fu18m)[-1],"_18m"))
-# 
-# fu18m = fu18m %>%
-#   mutate(fu18m_crfs_completed = apply(fu18m[,c("participant_followup_complete_18m","laboratory_results_complete_18m")], 1, function(x) sum(x==2, na.rm=T)))
-# 
-# data = merge(data, fu18m, by = "study_id", all.x = TRUE)
-# 
-# data = data %>%
-#   mutate(fu18m_crfs_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) + months(21) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(21) < notfollowed_pb_date)), 1*2, 0))
-# data$fu18m_crfs_completed = ifelse(data$fu18m_crfs_expected==0, 0, data$fu18m_crfs_completed)
-# 
-# data = data %>%
-#   mutate(fu18m_visit_completed = ifelse(participant_followup_complete_18m == 2 & fu_yn_18m == 1, 1, 0),
-#          fu18m_visit_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) + months(21) < current_quarter[2]) | (notfollowed_pb == 1 & as.Date(bp_date) + months(21) < notfollowed_pb_date)), 1, 0))
+fu18m = dat[dat$redcap_event_name=="18_months_arm_1" & dat$redcap_repeat_instrument == "",
+            c("study_id","fu_date","fu_yn","participant_followup_complete","laboratory_results_complete")]
+colnames(fu18m) = c(colnames(fu18m)[1],paste0(colnames(fu18m)[-1],"_18m"))
+
+fu18m = fu18m %>%
+  mutate(fu18m_crfs_completed = apply(fu18m[,c("participant_followup_complete_18m","laboratory_results_complete_18m")], 1, function(x) sum(x==2, na.rm=T)))
+
+data = merge(data, fu18m, by = "study_id", all.x = TRUE)
+
+data = data %>%
+  mutate(fu18m_crfs_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) < as.Date(current_quarter[2]) - months(21)) | (notfollowed_pb == 1 & as.Date(bp_date) < as.Date(notfollowed_pb_date) - months(21))), 1*2, 0))
+data$fu18m_crfs_completed = ifelse(data$fu18m_crfs_expected==0, 0, data$fu18m_crfs_completed)
+
+data = data %>%
+  mutate(fu18m_visit_completed = ifelse(participant_followup_complete_18m == 2 & fu_yn_18m == 1, 1, 0),
+         fu18m_visit_expected = ifelse(biopsied==1 & ((notfollowed_pb == 0 & as.Date(bp_date) < as.Date(current_quarter[2]) - months(21)) | (notfollowed_pb == 1 & as.Date(bp_date) < as.Date(notfollowed_pb_date) - months(21))), 1, 0))
+
+data$fu18m_crfs_completed = ifelse(data$fu18m_crfs_expected==0, 0, data$fu18m_crfs_completed)
+data$fu18m_visit_completed = ifelse(data$fu18m_visit_expected==0, 0, data$fu18m_visit_completed)
 
 ################ Return of biopsy results ################
 data = data %>%
@@ -387,7 +386,7 @@ crfs_completed_ckd = names(data)[str_detect(names(data), "crfs_completed$") & !(
 
 library(chron)
 
-blood_urine = read.csv('../report_card_data/kit-qc-list-export.csv')
+blood_urine = read.csv('../report_card_data/0901/kit-qc-list-export0901.csv')
 names(blood_urine) = c("kit_id", "redcap_data_access_group", "kit_type", "collection_date", "time_from_collection_to_frozen_hrs", "n_samples_affected")
 blood_urine = blood_urine[-1,]
 blood_urine = blood_urine %>% filter(redcap_data_access_group %in% c("CLU","JHMI","UPMC","YLE","BMC","CCF","JOS","UTSW"))
@@ -399,7 +398,7 @@ blood_urine = blood_urine %>%
   mutate(blood_samples = ifelse(kit_type %in% c("KPMP Followup Blood Kit 1st Annual", "KPMP Followup Blood Kit 3mAKI y2-10", "KPMP Post-Biopsy Blood Kit", "KPMP Standard Blood Kit"), 1, 0),
          spot_urine_samples = ifelse(kit_type %in% c("KPMP 20ml Spot Urine Kit", "KPMP Standard Urine Kit"), 1, 0))
 
-acd_cbr = read.csv('../report_card_data/acd-list-export.csv')
+acd_cbr = read.csv('../report_card_data/0901/acd-list-export0901.csv')
 names(acd_cbr) = c("status", "timing_days", "sample_id", "from_org", "acd_created", "volume", "ship_date", "receipt_date", "pbmcs", "pbcms_created", "acd_terminated", "term_reason")
 acd_cbr = acd_cbr[-1,]
 acd_cbr$redcap_data_access_group = factor(sapply(str_split(acd_cbr$from_org, "\\("), function(x) x[2]),
@@ -408,7 +407,7 @@ acd_cbr$redcap_data_access_group = factor(sapply(str_split(acd_cbr$from_org, "\\
 acd_cbr = acd_cbr[!is.na(acd_cbr$redcap_data_access_group) & acd_cbr$status == "Complete",]
 acd_cbr$time_from_created_to_received = difftime(acd_cbr$receipt_date, acd_cbr$acd_created)
 
-shipment = read.csv('../report_card_data/shipment-qc-list-export.csv')[,-1]
+shipment = read.csv('../report_card_data/0901/shipment-qc-list-export0901.csv')[,-1]
 shipment$redcap_data_access_group = factor(shipment$Ship.From,
                                            levels=c("CLU","JHMI","UPMC","YLE", "BMC","CCF","JOS","UTSW"),
                                            labels=c("columbia","jhmi","upmc","yale", "brigham","ccf","joslin","utsw"))
@@ -417,7 +416,7 @@ shipment = shipment %>%
   mutate(issues = ifelse(Incorrect.Shipping.Conditions=="Yes" | Incorrect.Temp=="Yes", 1, 0),
          ship_date = as.Date(shipment$Ship.Date, format = "%m/%d/%Y"))
 
-cores_triages = read.csv("../report_card_data/biopsy-qc-dashboard-export.csv")[-c(1:3),]
+cores_triages = read.csv("../report_card_data/0901/biopsy-qc-dashboard-export0901.csv")[-c(1:3),]
 cores_triages = cores_triages[,c(1:4,6,14,16,18,20,23,27)]
 colnames(cores_triages) = c("study_id","bp_kit_id_2","redcap_data_access_group","bp_date","kit_type","core1_vial1","core1_vial2","core1_vial3","core2_vial4","core3_vial5","core3_vial6")
 cores_triages = cores_triages %>%
@@ -441,7 +440,7 @@ cores_triages = cores_triages %>%
          core3_less10 = ifelse(as.times(core3) < as.times("00:10:00"), 1, 0),
          core3_less5 = ifelse(as.times(core3) < as.times("00:05:00"), 1, 0))
 
-cryostor = read.csv('../report_card_data/tissue-sample-tracker-export.csv')
+cryostor = read.csv('../report_card_data/0901/tissue-sample-tracker-export0901.csv')
 names(cryostor) = c("sample_id","study_id","bp_kit_id_2","current_site","available","sample_type","length_mm",
                     "redcap_data_access_group","created","time_at_rs_days","shipped_to_cbr","time_at_cbr_days","tis1","shipped_to_tis1","t1", "tis2","shipped_to_tis2","t2","sample_terminal_date")
 cryostor = cryostor[-c(1,2),]
@@ -450,4 +449,4 @@ cryostor$redcap_data_access_group = factor(cryostor$redcap_data_access_group,
                                            labels=c("columbia","jhmi","upmc","yale","brigham","ccf","joslin","utsw"))
 cryostor$created_date = as.Date(cryostor$created, format="%b %d, %Y")
 
-save.image(file = "../report_card_data/prepared_data.RData")
+save.image(file = "../report_card_data/0901/prepared_data0901.RData")

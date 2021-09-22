@@ -20,7 +20,7 @@ library(kableExtra)
 library(dplyr)
 library(tidyverse)
 
-load("../report_card_data/prepared_data.RData")
+load("../report_card_data/0901/prepared_data0901.RData")
 load("rctfns.RData")
 load("visitsfns.RData")
 load("biospecimensfncs.RData")
@@ -33,7 +33,7 @@ utsw1 = format_rct_kable(data, site = "utsw", type = "ckd",
                          goal = goal_utsw, goal1=goal_brigham, goal2=goal_ccf, goal3=goal_joslin, goal4=goal_utsw)
 
 kbl(utsw1$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UTSW", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UTSW", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.4cm") %>%
   column_spec(4, image=spec_image(c("images/empty.png", utsw1$change), 30, 30)) %>%
@@ -52,7 +52,7 @@ utsw2 = format_crfs_kable(data, site = "utsw", type = "ckd",
                           current_quarter = current_quarter, previous_quarter = previous_quarter)
 
 kbl(utsw2$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UTSW", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UTSW", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.4cm") %>%
   column_spec(4, image=spec_image(c("images/empty.png", utsw2$change), 30, 30)) %>%
@@ -62,7 +62,7 @@ kbl(utsw2$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
   column_spec(2, background=c("#d9d9d9", utsw2$bgc$current)) %>%
   column_spec(3, background=c("#d9d9d9", utsw2$bgc$previous)) %>%
   pack_rows("Participant Completed Surveys", 4, 5, bold=F) %>%
-  pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 6, 12, bold=F, escape=F) %>%
+  pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 6, 13, bold=F, escape=F) %>%
   footnote(alphabet=c("Expected: total number past upper limit of allowable window.",
                       "Includes 24 hour, 14 day, 28 day, 6 months, and 12 months follow-up visits.",
                       "Includes all consented participants and CRFs from enrollment to 12 months.",
@@ -79,7 +79,7 @@ utsw3 = format_biospecimens_kable(blood_urine, acd_cbr, shipment, cores_triages,
                                   current_quarter = current_quarter, previous_quarter = previous_quarter)
 
 kbl(utsw3$kb, linesep="", booktabs=T, align=c("l", rep("c",5)), escape=F,
-    col.names=linebreak(c("UTSW", "Current\nQuarter\n3/2/2021 -\n6/4/2021", "Previous\nQuarter\n12/1/2020 -\n3/1/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+    col.names=linebreak(c("UTSW", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   column_spec(1, width="7.9cm", latex_valign="m") %>%
   column_spec(4, image=spec_image(c("images/empty.png", utsw3$change), 30, 30)) %>%

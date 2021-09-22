@@ -1,0 +1,231 @@
+---
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyhead[L]{Kidney Precision Medicine Project \\ Recruitment Site Report Card \\ `r format(Sys.time(), '%B %d, %Y')`}
+- \fancyfoot[C]{}
+output: pdf_document
+geometry: left=.7cm, right=.7cm, top=2.7cm, bottom=2cm
+---
+
+\begin{center}
+\textbf{KPMP Combined Data Quality Report Card}
+\end{center}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+#Load library
+library(Hmisc)
+library(kableExtra)
+library(dplyr)
+library(tidyverse)
+
+load("../report_card_data/0901/prepared_data0901.RData")
+load("rctfns.RData")
+load("visitsfns.RData")
+load("biospecimensfncs.RData")
+load("setup_basicfns.RData")
+```
+
+```{r recruitment and retention}
+sum_brigham = summarise_rct_each(data = data, site = "brigham", 
+                                 current_quarter = current_quarter, 
+                                 previous_quarter = previous_quarter,
+                                 goal = goal_brigham)
+sum_ccf = summarise_rct_each(data = data, site = "ccf", 
+                             current_quarter = current_quarter, 
+                             previous_quarter = previous_quarter,
+                             goal = goal_ccf)
+sum_joslin = summarise_rct_each(data = data, site = "joslin", 
+                                current_quarter = current_quarter, 
+                                previous_quarter = previous_quarter,
+                                goal = goal_joslin)
+sum_utsw = summarise_rct_each(data = data, site = "utsw", 
+                              current_quarter = current_quarter, 
+                              previous_quarter = previous_quarter,
+                              goal = goal_utsw)
+
+# apply(sum_brigham$kb[7:10,-1], 2, function(x) sum(as.integer(x)))
+
+sum_ckd = rbind(sum_brigham$kb[1,], 
+                sum_brigham$kb[2,], sum_ccf$kb[2,], sum_joslin$kb[2,], sum_utsw$kb[2,],
+                sum_brigham$kb[3,], sum_ccf$kb[3,], sum_joslin$kb[3,], sum_utsw$kb[3,],
+                sum_brigham$kb[4,], sum_ccf$kb[4,], sum_joslin$kb[4,], sum_utsw$kb[4,],
+                sum_brigham$kb[5,], sum_ccf$kb[5,], sum_joslin$kb[5,], sum_utsw$kb[5,],
+                sum_brigham$kb[6,], sum_ccf$kb[6,], sum_joslin$kb[6,], sum_utsw$kb[6,],
+                sum_brigham$kb[7,], sum_ccf$kb[7,], sum_joslin$kb[7,], sum_utsw$kb[7,],
+                sum_brigham$kb[8,], sum_ccf$kb[8,], sum_joslin$kb[8,], sum_utsw$kb[8,],
+                sum_brigham$kb[9,], sum_ccf$kb[9,], sum_joslin$kb[9,], sum_utsw$kb[9,],
+                sum_brigham$kb[10,], sum_ccf$kb[10,], sum_joslin$kb[10,], sum_utsw$kb[10,],
+                sum_brigham$kb[11,], sum_ccf$kb[11,], sum_joslin$kb[11,], sum_utsw$kb[11,],
+                sum_brigham$kb[12,], sum_ccf$kb[12,], sum_joslin$kb[12,], sum_utsw$kb[12,],
+                sum_brigham$kb[13,], sum_ccf$kb[13,], sum_joslin$kb[13,], sum_utsw$kb[13,],
+                sum_brigham$kb[14,], sum_ccf$kb[14,], sum_joslin$kb[14,], sum_utsw$kb[14,]) %>%
+  add_column(sites = c("", rep(c("Brigham", "CCF", "Joslin", "UTSW"), 13)), .before = "current")
+
+sum_all_sites = summarise_all_sites_by_type(data = data, type = "ckd", 
+                                            goal1 = goal_brigham, goal2 = goal_ccf, goal3 = goal_joslin, goal4 = goal_utsw)
+
+sum_ckd = sum_ckd %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_ckd) = 1:nrow(sum_ckd)
+
+change = rep(sum_brigham$change, each = 4)
+change[seq(from = 2, to = 52, by = 4)] = sum_ccf$change
+change[seq(from = 3, to = 52, by = 4)] = sum_joslin$change
+change[seq(from = 4, to = 52, by = 4)] = sum_utsw$change
+
+col_goal_crr = c(sum_brigham$bgc$bgc_goal[1], sum_ccf$bgc$bgc_goal[1], sum_joslin$bgc$bgc_goal[1], sum_utsw$bgc$bgc_goal[1])
+col_rt_crr = c(sum_brigham$bgc$bgc_retention[1], sum_ccf$bgc$bgc_retention[1], sum_joslin$bgc$bgc_retention[1], sum_utsw$bgc$bgc_retention[1])
+col_goal_prv = c(sum_brigham$bgc$bgc_goal[2], sum_ccf$bgc$bgc_goal[2], sum_joslin$bgc$bgc_goal[2], sum_utsw$bgc$bgc_goal[2])
+col_rt_prv = c(sum_brigham$bgc$bgc_retention[2], sum_ccf$bgc$bgc_retention[2], sum_joslin$bgc$bgc_retention[2], sum_utsw$bgc$bgc_retention[2])
+
+kbl(sum_ckd, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change), 30, 30)) %>%
+  column_spec(3, background=c(rep("white", 17), col_goal_crr, rep("white",28), col_rt_crr)) %>%
+  column_spec(4, background=c(rep("white", 17), col_goal_prv, rep("white",28), col_rt_prv)) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  pack_rows("Not Followed prior to Biopsy (N)", 22, 37, bold=F) %>%
+  pack_rows("Not Followed post Biopsy (N)", 38, 49, bold=F) %>%
+  footnote(number="100-(participants not followed post biopsy/total participants biopsied*100).")
+```
+
+\newpage
+
+```{r visits and crfs}
+sum_brigham = summarise_visits_crfs_each(data = data, site = "brigham", type = "ckd",
+                                         current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_ccf = summarise_visits_crfs_each(data = data, site = "ccf", type = "ckd",
+                                     current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_joslin = summarise_visits_crfs_each(data = data, site = "joslin", type = "ckd",
+                                        current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_utsw = summarise_visits_crfs_each(data = data, site = "utsw", type = "ckd",
+                                      current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+sum_ckd = rbind(sum_brigham$kb[1,], 
+                sum_brigham$kb[2,], sum_ccf$kb[2,], sum_joslin$kb[2,], sum_utsw$kb[2,],
+                sum_brigham$kb[3,], sum_ccf$kb[3,], sum_joslin$kb[3,], sum_utsw$kb[3,],
+                sum_brigham$kb[4,], sum_ccf$kb[4,], sum_joslin$kb[4,], sum_utsw$kb[4,],
+                sum_brigham$kb[5,], sum_ccf$kb[5,], sum_joslin$kb[5,], sum_utsw$kb[5,],
+                sum_brigham$kb[6,], sum_ccf$kb[6,], sum_joslin$kb[6,], sum_utsw$kb[6,],
+                sum_brigham$kb[7,], sum_ccf$kb[7,], sum_joslin$kb[7,], sum_utsw$kb[7,],
+                sum_brigham$kb[8,], sum_ccf$kb[8,], sum_joslin$kb[8,], sum_utsw$kb[8,],
+                sum_brigham$kb[9,], sum_ccf$kb[9,], sum_joslin$kb[9,], sum_utsw$kb[9,],
+                sum_brigham$kb[10,], sum_ccf$kb[10,], sum_joslin$kb[10,], sum_utsw$kb[10,],
+                sum_brigham$kb[11,], sum_ccf$kb[11,], sum_joslin$kb[11,], sum_utsw$kb[11,],
+                sum_brigham$kb[12,], sum_ccf$kb[12,], sum_joslin$kb[12,], sum_utsw$kb[12,],
+                sum_brigham$kb[13,], sum_ccf$kb[13,], sum_joslin$kb[13,], sum_utsw$kb[13,],
+                sum_brigham$kb[14,], sum_ccf$kb[14,], sum_joslin$kb[14,], sum_utsw$kb[14,]) %>%
+  add_column(sites = c("", rep(c("Brigham", "CCF", "Joslin", "UTSW"), 13)), .before = "current")
+
+sum_all_sites = summarise_crfs_all_sites_by_type(data = data, type = "ckd")
+
+sum_ckd = sum_ckd %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_ckd) = 1:nrow(sum_ckd)
+
+change = rep(sum_brigham$change, each = 4)
+change[seq(from = 2, to = 52, by = 4)] = sum_ccf$change
+change[seq(from = 3, to = 52, by = 4)] = sum_joslin$change
+change[seq(from = 4, to = 52, by = 4)] = sum_utsw$change
+
+col_crr = rep(sum_brigham$bgc$current, each = 4)
+col_crr[seq(from = 2, to = 52, by = 4)] = sum_ccf$bgc$current
+col_crr[seq(from = 3, to = 52, by = 4)] = sum_joslin$bgc$current
+col_crr[seq(from = 4, to = 52, by = 4)] = sum_utsw$bgc$current
+
+col_prv = rep(sum_brigham$bgc$previous, each = 4)
+col_prv[seq(from = 2, to = 52, by = 4)] = sum_ccf$bgc$previous
+col_prv[seq(from = 3, to = 52, by = 4)] = sum_joslin$bgc$previous
+col_prv[seq(from = 4, to = 52, by = 4)] = sum_utsw$bgc$previous
+
+kbl(sum_ckd, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+  column_spec(1, width="4.7cm") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change), 30, 30)) %>%
+  column_spec(3, background=c("white", col_crr)) %>%
+  column_spec(4, background=c("white", col_prv)) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  # pack_rows("Participant Completed Surveys", 10, 17, bold=F, latex_gap_space = "0em") %>%
+  # pack_rows(paste0("CRFs Per Timepoint", footnote_marker_alphabet(5, "latex")), 18, 49, bold=F, escape=F, latex_gap_space = "0em") %>%
+  footnote(alphabet=c("Expected: total number past upper limit of allowable window.",
+                      "Includes 24 hour, 14 day, 28 day, 6 months, and 12 months follow-up visits.",
+                      "Includes all consented participants and CRFs from enrollment to 12 months.",
+                      "6 month experience survey was implemented approximately 1 year after the start of recruitment, therefore some participants did not have the opportunity to complete this CRF.",
+                      "Per timepoint, different number of CRFs are included."),
+           threeparttable=T)
+```
+
+\newpage
+
+
+```{r biospecimens}
+sum_brigham = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "brigham",
+                                          current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_ccf = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "ccf",
+                                      current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_joslin = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "joslin",
+                                         current_quarter = current_quarter, previous_quarter = previous_quarter)
+sum_utsw = summarise_biospecimens_each(blood_urine, acd_cbr, shipment, cores_triages, cryostor, site = "utsw",
+                                       current_quarter = current_quarter, previous_quarter = previous_quarter)
+
+sum_ckd = rbind(sum_brigham$kb[1,], 
+                sum_brigham$kb[2,], sum_ccf$kb[2,], sum_joslin$kb[2,], sum_utsw$kb[2,],
+                sum_brigham$kb[3,], sum_ccf$kb[3,], sum_joslin$kb[3,], sum_utsw$kb[3,],
+                sum_brigham$kb[4,], sum_ccf$kb[4,], sum_joslin$kb[4,], sum_utsw$kb[4,],
+                sum_brigham$kb[5,], sum_ccf$kb[5,], sum_joslin$kb[5,], sum_utsw$kb[5,],
+                sum_brigham$kb[6,], sum_ccf$kb[6,], sum_joslin$kb[6,], sum_utsw$kb[6,],
+                sum_brigham$kb[7,], sum_ccf$kb[7,], sum_joslin$kb[7,], sum_utsw$kb[7,],
+                sum_brigham$kb[8,], sum_ccf$kb[8,], sum_joslin$kb[8,], sum_utsw$kb[8,],
+                sum_brigham$kb[9,], sum_ccf$kb[9,], sum_joslin$kb[9,], sum_utsw$kb[9,]) %>%
+  add_column(sites = c("", rep(c("Brigham", "CCF", "Joslin", "UTSW"), 8)), .before = "current")
+
+sum_all_sites = summarise_biospecimens_all_sites_by_type(blood_urine, acd_cbr, shipment, cores_triages, cryostor, type = "ckd")
+
+sum_ckd = sum_ckd %>%
+  mutate(all = linebreak(c("", rep(sum_all_sites, each = 4)), align="c"))
+
+rownames(sum_ckd) = 1:nrow(sum_ckd)
+
+change = rep(sum_brigham$change, each = 4)
+change[seq(from = 2, to = 29, by = 4)] = sum_ccf$change
+change[seq(from = 3, to = 29, by = 4)] = sum_joslin$change
+change[seq(from = 4, to = 29, by = 4)] = sum_utsw$change
+
+col_crr = rep(sum_brigham$bgc$current, each = 4)
+col_crr[seq(from = 2, to = 29, by = 4)] = sum_ccf$bgc$current
+col_crr[seq(from = 3, to = 29, by = 4)] = sum_joslin$bgc$current
+col_crr[seq(from = 4, to = 29, by = 4)] = sum_utsw$bgc$current
+
+col_prv = rep(sum_brigham$bgc$previous, each = 4)
+col_prv[seq(from = 2, to = 29, by = 4)] = sum_ccf$bgc$previous
+col_prv[seq(from = 3, to = 29, by = 4)] = sum_joslin$bgc$previous
+col_prv[seq(from = 4, to = 29, by = 4)] = sum_utsw$bgc$previous
+
+kbl(sum_ckd, linesep="", longtable = T, booktabs=T, align=c("l", rep("c",6)), escape=F,
+    col.names=linebreak(c("Metric", "Site", "Current\nQuarter\n6/5/2021 -\n9/1/2021", "Previous\nQuarter\n3/2/2021 -\n6/4/2021", "Change", "Cumulative", "All CKD Sites\n(Range)"), align="c")) %>%
+  column_spec(1, width="5.7cm") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  collapse_rows(columns = c(1, 7), latex_hline = "major", valign = "middle", target = 1) %>%
+  column_spec(5, image=spec_image(c("images/empty.png", change, rep("images/empty.png", 4)), 30, 30)) %>%
+  column_spec(3, background=c("white", col_crr, rep("white", 4))) %>%
+  column_spec(4, background=c("white", col_prv, rep("white", 4))) %>%
+  row_spec(1, italic=T, background="#d9d9d9") %>%
+  footnote(symbol="Issues include incorrect temperature and incorrect shipping conditions.")
+```
+
+```{r}
+color_dist = data.frame(color = cell_spec("", 
+                                          background = c("#99e5bc", "#ffff99", "#ff999a")),
+                        dist = c(">=90\\%", "70-<90\\%", "<70\\%"))
+colnames(color_dist) = NULL
+
+kbl(color_dist, linesep="", booktabs=T, align="l", escape=F)
+```

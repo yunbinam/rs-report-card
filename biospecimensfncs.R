@@ -145,22 +145,24 @@ summarise_biospecimens_each = function(blood_urine, acd_cbr, shipment, cores_tri
   previous_chrc = apply(previous, 1, function(x) format_pct_rst(x[1], x[2], x[3]))
   cumulative_chrc = apply(cumulative, 1, function(x) format_pct_rst(x[1], x[2], x[3]))
   
-  if(site == "joslin"){
-    cumulative_chrc_freeze = "15/15 (100\\%)"
+  if(sum(site == c("joslin", "brigham")) == 2){
+    cumulative_chrc_freeze = "25/26 (96\\%)"
+  } else if(site == "joslin"){
+    cumulative_chrc_freeze = "17/17 (100\\%)"
   } else if(site == "brigham"){
-    cumulative_chrc_freeze = "5/6 (83\\%)"
+    cumulative_chrc_freeze = "8/9 (89\\%)"
   } else if(site == "utsw"){
-    cumulative_chrc_freeze = "22/22 (100\\%)"
+    cumulative_chrc_freeze = "30/30 (100\\%)"
   } else if(site == "jhmi"){
-    cumulative_chrc_freeze = "8/8 (100\\%)"
+    cumulative_chrc_freeze = "9/9 (100\\%)"
   } else if(site == "ccf"){
-    cumulative_chrc_freeze = "18/19 (95\\%)"
+    cumulative_chrc_freeze = "21/22 (95\\%)"
   } else if(site == "columbia"){
     cumulative_chrc_freeze = "7/7 (100\\%)"
   } else if(site == "upmc"){
     cumulative_chrc_freeze = "5/5 (100\\%)"
   } else if(site == "yale"){
-    cumulative_chrc_freeze = "4/5 (80\\%)"
+    cumulative_chrc_freeze = "6/7 (86\\%)"
   }
   
   summarised_kb = data.frame(
@@ -228,9 +230,9 @@ summarise_biospecimens_all_sites_by_type = function(blood_urine, acd_cbr, shipme
   })
   
   if(type == "ckd"){
-    all_rst = c(all_rst, "97\\% (83\\%-100\\%)")
+    all_rst = c(all_rst, "97\\% (89\\%-100\\%)")
   } else{
-    all_rst = c(all_rst, "96\\% (80\\%-100\\%)")
+    all_rst = c(all_rst, "96\\% (86\\%-100\\%)")
   }
   
   return(all_rst)
